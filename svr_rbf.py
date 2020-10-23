@@ -1,19 +1,33 @@
 import numpy as np
 import xlrd
+import matplotlib.pyplot as plt
+import pandas as pd
 
-loc = ("data.xlsx")
-storyPoints = []
-estimatedTime = []
+#x for story point 
+#y for time in days
 
-wb = xlrd.open_workbook(loc)
-sheet = wb.sheet_by_index(0)
-sheet.cell_value(0, 0)
+dataset=pd.read_csv("data.csv")
+x=dataset.iloc[:,1:-1].values
+y=dataset.iloc[:,-1].values
+y=y.reshape(len(y),1)
 
-for i in range(sheet.nrows):
-    storyPoints.append(sheet.cell_value(i, 1))
+print(x)
+print(y)
 
-for i in range(sheet.nrows):
-    estimatedTime.append(sheet.cell_value(i, 8))
+from sklearn.preprocessing import StandardScaler
+sc=StandardScaler()
+x=sc.fit_transform(x)
+sc_y=StandardScaler()
+y=sc_y.fit_transform(y)
 
-print(storyPoints)
-print(estimatedTime)
+from sklearn.svm import SVR
+r=SVR(kernel="rbf")
+r.fit(x, y)
+print(sc_y.inverse_transform(r.predict(sc.transform([[100]]))))
+ 
+plt.scatter(sc.inverse_transform(x),sc_y.inverse_transform(y), color="red")
+plt.plot(sc.inverse_transform(x),sc_y.inverse_transform(r.predict(x)),color="blue")
+plt.title("Salary Prediction (SVR) - RBF Kernal")
+plt.xlabel("Story Point")
+plt.ylabel("Time")
+plt.show()
