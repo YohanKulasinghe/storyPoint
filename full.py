@@ -25,13 +25,13 @@ plt.plot(sc.inverse_transform(trainSP),sc_y.inverse_transform(r.predict(trainSP)
 plt.title("Salary Prediction (SVR) - RBF Kernal")
 plt.xlabel("Story Point")
 plt.ylabel("Time")
-plt.show()
+#plt.show()
 
-trainDataset=pd.read_csv("evaluate.csv")
+testDataset=pd.read_csv("evaluate.csv")
 print("\n\n Printing Evaluation Dataset\n")
-print(trainDataset)
-testSP=trainDataset.iloc[:,1:-1].values
-testT=trainDataset.iloc[:,2:].values
+print(testDataset)
+testSP=testDataset.iloc[:,1:-3].values
+testT=testDataset.iloc[:,2:-2].values
 
 testSPList = testSP.flatten()
 testTimeList = testT.flatten()
@@ -47,22 +47,22 @@ for sp in testSPList :
 for t in testTimeList :
     testSetActualTime.append(t)  
 
-print("\n Output Summery\n")
+print("\n Output Summery for time\n")
 
 print("Actual ", testSetActualTime) 
 print("Predct ", testSetPredictedTime)
 
 n = len(testSetActualTime)
 
-MMRE = 0
+MMRE_time = 0
 
 for i in range(n):
     print(abs(testSetActualTime[i]-testSetPredictedTime[i])/testSetActualTime[i])
-    MMRE = MMRE + (abs(testSetActualTime[i]-testSetPredictedTime[i])/testSetActualTime[i])
+    MMRE_time = MMRE_time + (abs(testSetActualTime[i]-testSetPredictedTime[i])/testSetActualTime[i])
 
-MMRE = MMRE/n * 100
+MMRE_time = MMRE_time/n * 100
 
-print("\nMMRE For time= %f " % (MMRE))
+print("\nMMRE For time= %f " % (MMRE_time))
 
 # temp1 = 0
 
@@ -108,9 +108,37 @@ cost_driver = 1 + fraction_non_tech_salary + fraction_equipment + fraction_depre
     fraction_repair_and_maintenance + fraction_sanitary + \
     fraction_marketing + fraction_other
 
-print(cost_driver)
+print("\n Output Summery for time\n")
 
-predicted_cost = cost_driver * 230000 * 58/30
+print("Cost Driver" , cost_driver)
 
-print(predicted_cost)
 
+test_team_salary = testDataset.iloc[:,3:-1].values
+test_actual_cost = testDataset.iloc[:,4:].values
+
+test_team_salary = test_team_salary.flatten()
+test_actual_cost = test_actual_cost.flatten()
+
+
+actual_cost = []
+
+for i in range(n):
+    actual_cost.append(test_actual_cost[i])
+
+predicted_cost = []
+
+for i in range(n):
+    predicted_cost.append(round(testSetPredictedTime[i] / 22 *test_team_salary[i]*cost_driver))  
+
+print("Actual Cost" , actual_cost)
+print("Predicted Cost", predicted_cost)
+
+MMRE_cost = 0
+
+for i in range(n):
+    print(abs(test_actual_cost[i]-predicted_cost[i])/test_actual_cost[i])
+    MMRE_cost = MMRE_cost + (abs(test_actual_cost[i]-predicted_cost[i])/test_actual_cost[i])
+
+MMRE_cost = MMRE_cost/n * 100
+
+print("\nMMRE For cost= %f " % (MMRE_cost))
